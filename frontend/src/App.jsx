@@ -690,7 +690,7 @@ export default function App() {
               </div>
             </div>
           </div>
-        )))
+        ))}
 
         {/* ====================================================================
             VIEW B: INVENTORY DIRECTORY
