@@ -495,7 +495,7 @@ export default function App() {
         {/* Floating Notification System */}
         {errorMsg && (
           <div style={{
-            position: 'fixed', top: '24px', right: '24px', backgroundColor: 'var(--danger-glow)',
+            position: 'fixed', bottom: '24px', right: '24px', backgroundColor: 'var(--danger-glow)',
             color: 'var(--danger)', border: '1px solid rgba(239, 68, 68, 0.3)',
             padding: '12px 24px', borderRadius: '12px', zIndex: '9999', display: 'flex', gap: '10px',
             alignItems: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)'
@@ -506,7 +506,7 @@ export default function App() {
         )}
         {successMsg && (
           <div style={{
-            position: 'fixed', top: '24px', right: '24px', backgroundColor: 'var(--success-glow)',
+            position: 'fixed', bottom: '24px', right: '24px', backgroundColor: 'var(--success-glow)',
             color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.3)',
             padding: '12px 24px', borderRadius: '12px', zIndex: '9999', display: 'flex', gap: '10px',
             alignItems: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)'
