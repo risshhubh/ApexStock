@@ -40,6 +40,7 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const [productSearchQuery, setProductSearchQuery] = useState('');
 
@@ -81,19 +82,28 @@ export default function App() {
   // Fetch Data
   const fetchData = async () => {
     try {
-      const [resAnal, resProd, resCust, resOrd] = await Promise.all([
-        fetch(`${API_URL}/analytics`).then(r => r.json()),
-        fetch(`${API_URL}/products`).then(r => r.json()),
-        fetch(`${API_URL}/customers`).then(r => r.json()),
-        fetch(`${API_URL}/orders`).then(r => r.json())
-      ]);
-      setAnalytics(resAnal);
-      setProducts(resProd);
-      setCustomers(resCust);
-      setOrders(resOrd);
+      const fetchAnal = fetch(`${API_URL}/analytics`)
+        .then(r => r.json())
+        .then(data => setAnalytics(data));
+
+      const fetchProd = fetch(`${API_URL}/products`)
+        .then(r => r.json())
+        .then(data => setProducts(data));
+
+      const fetchCust = fetch(`${API_URL}/customers`)
+        .then(r => r.json())
+        .then(data => setCustomers(data));
+
+      const fetchOrd = fetch(`${API_URL}/orders`)
+        .then(r => r.json())
+        .then(data => setOrders(data));
+
+      await Promise.all([fetchAnal, fetchProd, fetchCust, fetchOrd]);
     } catch (err) {
       console.error('API Error:', err);
       showTemporaryAlert('Failed to load data from backend server.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -523,8 +533,8 @@ export default function App() {
         {/* ====================================================================
             VIEW A: DASHBOARD VIEW
             ==================================================================== */}
-        {currentView === 'dashboard' && analytics && (
-          <div>
+        {currentView === 'dashboard' && (
+          <div className="fade-in">
             <div className="page-header">
               <div className="page-title-desc">
                 <h1 className="page-title">Operation Dashboard</h1>
@@ -543,7 +553,7 @@ export default function App() {
                 </div>
                 <div className="kpi-info">
                   <span className="kpi-label">Total Products</span>
-                  <span className="kpi-value">{analytics.metrics.totalProducts}</span>
+                  <span className="kpi-value">{analytics ? analytics.metrics.totalProducts : '--'}</span>
                 </div>
               </div>
 
@@ -553,7 +563,7 @@ export default function App() {
                 </div>
                 <div className="kpi-info">
                   <span className="kpi-label">Total Customers</span>
-                  <span className="kpi-value">{analytics.metrics.totalCustomers}</span>
+                  <span className="kpi-value">{analytics ? analytics.metrics.totalCustomers : '--'}</span>
                 </div>
               </div>
 
@@ -563,7 +573,7 @@ export default function App() {
                 </div>
                 <div className="kpi-info">
                   <span className="kpi-label">Total Orders</span>
-                  <span className="kpi-value">{analytics.metrics.totalOrders}</span>
+                  <span className="kpi-value">{analytics ? analytics.metrics.totalOrders : '--'}</span>
                 </div>
               </div>
 
@@ -573,7 +583,7 @@ export default function App() {
                 </div>
                 <div className="kpi-info">
                   <span className="kpi-label">Low Stock Products</span>
-                  <span className="kpi-value">{analytics.metrics.lowStockAlerts}</span>
+                  <span className="kpi-value">{analytics ? analytics.metrics.lowStockAlerts : '--'}</span>
                 </div>
               </div>
             </div>
@@ -592,20 +602,26 @@ export default function App() {
                 </div>
                 
                 <div className="chart-container">
-                  {analytics.salesTrend.map((day, idx) => {
-                    const maxVal = Math.max(...analytics.salesTrend.map(d => d.sales), 500);
-                    const heightPct = (day.sales / maxVal) * 90;
-                    return (
-                      <div className="chart-bar-wrapper" key={idx}>
-                        <div className="chart-bar" style={{ height: `${Math.max(5, heightPct)}%` }}>
-                          <div className="chart-tooltip">
-                            ${day.sales.toFixed(2)} ({day.count} orders)
+                  {!analytics ? (
+                    <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-dark)' }}>
+                      Loading trend data...
+                    </div>
+                  ) : (
+                    analytics.salesTrend.map((day, idx) => {
+                      const maxVal = Math.max(...analytics.salesTrend.map(d => d.sales), 500);
+                      const heightPct = (day.sales / maxVal) * 90;
+                      return (
+                        <div className="chart-bar-wrapper" key={idx}>
+                          <div className="chart-bar" style={{ height: `${Math.max(5, heightPct)}%` }}>
+                            <div className="chart-tooltip">
+                              ${day.sales.toFixed(2)} ({day.count} orders)
+                            </div>
                           </div>
+                          <span className="chart-label">{day.date}</span>
                         </div>
-                        <span className="chart-label">{day.date}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
 
@@ -615,11 +631,21 @@ export default function App() {
                   <h3 className="panel-title" style={{ color: 'var(--danger)' }}>
                     <IconAlert /> Critical Stock Alerts
                   </h3>
-                  <span className="badge badge-out_of_stock">{analytics.lowStockProducts.length} Items</span>
+                  <span className="badge badge-out_of_stock">{analytics ? analytics.lowStockProducts.length : '0'} Items</span>
                 </div>
 
                 <div className="item-list">
-                  {analytics.lowStockProducts.length === 0 ? (
+                  {!analytics ? (
+                    [...Array(3)].map((_, i) => (
+                      <div className="item-row pulse" key={i} style={{ height: '58px' }}>
+                        <div className="item-meta">
+                          <div style={{ width: '120px', height: '14px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', marginBottom: '6px' }} />
+                          <div style={{ width: '70px', height: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }} />
+                        </div>
+                        <div style={{ width: '50px', height: '18px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} />
+                      </div>
+                    ))
+                  ) : analytics.lowStockProducts.length === 0 ? (
                     <div style={{ textAlign: 'center', color: 'var(--text-dark)', padding: '24px 0' }}>
                       ✓ All stock levels optimal
                     </div>
@@ -660,7 +686,16 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {analytics.topProducts.length === 0 ? (
+                    {!analytics ? (
+                      [...Array(3)].map((_, i) => (
+                        <tr key={i} className="pulse">
+                          <td style={{ height: '48px' }}><div style={{ width: '110px', height: '14px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '60px', height: '14px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '50px', height: '14px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '70px', height: '14px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                        </tr>
+                      ))
+                    ) : analytics.topProducts.length === 0 ? (
                       <tr>
                         <td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-dark)' }}>
                           No sales data recorded yet.
@@ -689,7 +724,7 @@ export default function App() {
             VIEW B: INVENTORY DIRECTORY
             ==================================================================== */}
         {currentView === 'inventory' && (
-          <div>
+          <div className="fade-in">
             <div className="page-header">
               <div className="page-title-desc">
                 <h1 className="page-title">Products</h1>
@@ -769,7 +804,22 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredProducts.length === 0 ? (
+                    {loading ? (
+                      [...Array(5)].map((_, i) => (
+                        <tr key={i} className="pulse">
+                          <td style={{ height: '55px' }}><div style={{ width: '60px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td>
+                            <div style={{ width: '120px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', marginBottom: '6px' }} />
+                            <div style={{ width: '180px', height: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }} />
+                          </td>
+                          <td className="hide-mobile"><div style={{ width: '80px', height: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '50px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '70px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '60px', height: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '80px', height: '30px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                        </tr>
+                      ))
+                    ) : filteredProducts.length === 0 ? (
                       <tr>
                         <td colSpan="7" style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-dark)' }}>
                           No products found matching filters.
@@ -823,7 +873,7 @@ export default function App() {
             VIEW C: ORDER REGISTRY
             ==================================================================== */}
         {currentView === 'orders' && (
-          <div>
+          <div className="fade-in">
             <div className="page-header">
               <div className="page-title-desc">
                 <h1 className="page-title">Orders</h1>
@@ -851,7 +901,23 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.length === 0 ? (
+                    {loading ? (
+                      [...Array(5)].map((_, i) => (
+                        <tr key={i} className="pulse">
+                          <td style={{ height: '55px' }}><div style={{ width: '80px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td className="hide-mobile"><div style={{ width: '80px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td>
+                            <div style={{ width: '100px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', marginBottom: '6px' }} />
+                            <div style={{ width: '140px', height: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }} />
+                          </td>
+                          <td className="hide-mobile"><div style={{ width: '50px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td className="hide-mobile"><div style={{ width: '120px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '60px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '80px', height: '24px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '100px', height: '30px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                        </tr>
+                      ))
+                    ) : orders.length === 0 ? (
                       <tr>
                         <td colSpan="8" style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-dark)' }}>
                           No orders registered in system database.
@@ -923,7 +989,7 @@ export default function App() {
             VIEW D: CUSTOMER DIRECTORY
             ==================================================================== */}
         {currentView === 'customers' && (
-          <div>
+          <div className="fade-in">
             <div className="page-header">
               <div className="page-title-desc">
                 <h1 className="page-title">Customers</h1>
@@ -948,7 +1014,18 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {customers.length === 0 ? (
+                    {loading ? (
+                      [...Array(5)].map((_, i) => (
+                        <tr key={i} className="pulse">
+                          <td style={{ height: '55px' }}><div style={{ width: '100px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td className="hide-mobile"><div style={{ width: '150px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td className="hide-mobile"><div style={{ width: '90px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '80px', height: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td className="hide-mobile"><div style={{ width: '80px', height: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                          <td><div style={{ width: '80px', height: '30px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }} /></td>
+                        </tr>
+                      ))
+                    ) : customers.length === 0 ? (
                       <tr>
                         <td colSpan="6" style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-dark)' }}>
                           No customers currently registered in the database.

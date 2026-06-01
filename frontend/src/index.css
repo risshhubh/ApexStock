@@ -858,6 +858,20 @@ h1, h2, h3, h4, h5, h6 {
   to { transform: scale(1); opacity: 1; }
 }
 
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+.pulse {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+
 /* ============================================================================
    RESPONSIVE DESIGN (MOBILE & TABLET SUPPORT)
    ============================================================================ */
