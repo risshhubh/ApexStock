@@ -1316,15 +1316,34 @@ export default function App() {
                         
                         <div className="cart-item-actions">
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-dark)' }}>Qty:</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-dark)', marginRight: '4px' }}>Qty:</span>
+                            <button 
+                              type="button" 
+                              className="btn btn-secondary" 
+                              style={{ padding: '2px 8px', minWidth: '24px', height: '24px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              onClick={() => updateCartQuantity(item.productId, item.quantity - 1, item.maxStock)}
+                              disabled={item.quantity <= 1}
+                            >
+                              -
+                            </button>
                             <input 
                               type="number"
                               min="1"
                               className="form-input cart-quantity-input"
+                              style={{ width: '40px', padding: '2px', textAlign: 'center', height: '24px', fontSize: '0.8rem' }}
                               value={item.quantity}
                               onChange={(e) => updateCartQuantity(item.productId, e.target.value, item.maxStock)}
                             />
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-dark)' }}>/ {item.maxStock}</span>
+                            <button 
+                              type="button" 
+                              className="btn btn-secondary" 
+                              style={{ padding: '2px 8px', minWidth: '24px', height: '24px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              onClick={() => updateCartQuantity(item.productId, item.quantity + 1, item.maxStock)}
+                              disabled={item.quantity >= item.maxStock}
+                            >
+                              +
+                            </button>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-dark)', marginLeft: '4px' }}>/ {item.maxStock}</span>
                           </div>
                           
                           <button 
