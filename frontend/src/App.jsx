@@ -34,7 +34,6 @@ const IconAlert = () => (
 );
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState('dashboard');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [analytics, setAnalytics] = useState(null);
@@ -79,7 +78,6 @@ export default function App() {
 
   // Fetch Data
   const fetchData = async () => {
-    setLoading(true);
     try {
       const [resAnal, resProd, resCust, resOrd] = await Promise.all([
         fetch(`${API_URL}/analytics`).then(r => r.json()),
@@ -94,10 +92,6 @@ export default function App() {
     } catch (err) {
       console.error('API Error:', err);
       showTemporaryAlert('Failed to load data from backend server.', 'error');
-    } finally {
-      // Ensure spinner is visible for at least 1 second for better UX
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setLoading(false);
     }
   };
 
@@ -525,12 +519,7 @@ export default function App() {
         {/* ====================================================================
             VIEW A: DASHBOARD VIEW
             ==================================================================== */}
-        {currentView === 'dashboard' && (loading || !analytics ? (
-          <div className="loader-container">
-            <div className="loader"></div>
-            <p style={{ color: 'var(--text-muted)', marginTop: '12px' }}>Loading dashboard data...</p>
-          </div>
-        ) : (
+        {currentView === 'dashboard' && analytics && (
           <div>
             <div className="page-header">
               <div className="page-title-desc">
@@ -690,7 +679,7 @@ export default function App() {
               </div>
             </div>
           </div>
-        ))}
+        )}
 
         {/* ====================================================================
             VIEW B: INVENTORY DIRECTORY
