@@ -95,6 +95,8 @@ export default function App() {
       console.error('API Error:', err);
       showTemporaryAlert('Failed to load data from backend server.', 'error');
     } finally {
+      // Ensure spinner is visible for at least 1 second for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setLoading(false);
     }
   };
@@ -523,11 +525,20 @@ export default function App() {
         {/* ====================================================================
             VIEW A: DASHBOARD VIEW
             ==================================================================== */}
-        {currentView === 'dashboard' && (
-        loading ? (
-          <div className="loader-container">
-            <div className="loader"></div>
-            <p style={{ color: 'var(--text-muted)', marginTop: '12px' }}>Loading dashboard data...</p>
+        {currentView === 'dashboard' && (loading || !analytics ? (
+          <div className="dashboard-loading">
+            {/* KPI Skeletons */}
+            <div className="kpi-grid">
+              <div className="card skeleton-box" style={{height: '80px'}}></div>
+              <div className="card skeleton-box" style={{height: '80px'}}></div>
+              <div className="card skeleton-box" style={{height: '80px'}}></div>
+              <div className="card skeleton-box" style={{height: '80px'}}></div>
+            </div>
+            {/* Chart & Table Skeletons */}
+            <div className="dashboard-details-grid">
+              <div className="card skeleton-box" style={{height: '250px'}}></div>
+              <div className="card skeleton-box" style={{height: '250px'}}></div>
+            </div>
           </div>
         ) : (
           analytics && (

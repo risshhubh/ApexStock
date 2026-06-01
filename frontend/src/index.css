@@ -689,6 +689,25 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-main);
 }
 
+/* Dashboard Loading Skeleton */
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.skeleton-box {
+  background: var(--border-mute);
+  border-radius: var(--radius-sm);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
 /* Form Styles */
 .form-group {
   display: flex;
