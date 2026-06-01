@@ -526,22 +526,11 @@ export default function App() {
             VIEW A: DASHBOARD VIEW
             ==================================================================== */}
         {currentView === 'dashboard' && (loading || !analytics ? (
-          <div className="dashboard-loading">
-            {/* KPI Skeletons */}
-            <div className="kpi-grid">
-              <div className="card skeleton-box" style={{height: '80px'}}></div>
-              <div className="card skeleton-box" style={{height: '80px'}}></div>
-              <div className="card skeleton-box" style={{height: '80px'}}></div>
-              <div className="card skeleton-box" style={{height: '80px'}}></div>
-            </div>
-            {/* Chart & Table Skeletons */}
-            <div className="dashboard-details-grid">
-              <div className="card skeleton-box" style={{height: '250px'}}></div>
-              <div className="card skeleton-box" style={{height: '250px'}}></div>
-            </div>
+          <div className="loader-container">
+            <div className="loader"></div>
+            <p style={{ color: 'var(--text-muted)', marginTop: '12px' }}>Loading dashboard data...</p>
           </div>
         ) : (
-          analytics && (
           <div>
             <div className="page-header">
               <div className="page-title-desc">
