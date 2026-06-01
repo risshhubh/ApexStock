@@ -1,6 +1,6 @@
-# StockFlow - Inventory & Order Management System
+# ApexStock - Inventory & Order Management System
 
-StockFlow is a modern, high-performance, containerized Inventory & Order Management System. It is built as a multi-container microservice stack managed by Docker Compose, featuring a **Vite + React** frontend served by **Nginx Alpine**, a **Python FastAPI** REST API, and a **PostgreSQL** database managed via **SQLAlchemy ORM**.
+ApexStock is a modern, high-performance, containerized Inventory & Order Management System. It is built as a multi-container microservice stack managed by Docker Compose, featuring a **Vite + React** frontend served by **Nginx Alpine**, a **Python FastAPI** REST API, and a **PostgreSQL** database managed via **SQLAlchemy ORM**.
 
 ---
 
@@ -92,7 +92,7 @@ graph TD
    This automatically reads our SQLAlchemy tables and creates them inside PostgreSQL if they do not exist.
 3. **Automated Seeding**: The system executes [seed.py](file:///r:/Inventory%20&%20Order%20Management%20System/backend/app/seed.py) to purge tables and populate initial mock records:
    * **3 Customers** (Acme Corp, Jane Doe, Wayne Enterprises)
-   * **9 Products** (electronics, office items, industrial gear, including out-of-stock items)
+   * **4 Products** (ThinkPad laptop, UltraWide monitor, wireless mouse, ergonomic chair)
    * **4 Orders** in various states (`PENDING`, `SHIPPED`, `DELIVERED`, `CANCELLED`) to populate the charts.
 
 ---
