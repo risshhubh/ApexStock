@@ -176,6 +176,12 @@ docker compose down
 ```
 
 ---
+## 🌐 Deployment
+
+- Frontend: https://apex-stock.vercel.app/
+- Backend: https://apexstock-backend.onrender.com
+
+---
 
 ## 🗄️ Database & Container Inspection
 
