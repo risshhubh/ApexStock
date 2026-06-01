@@ -2,6 +2,10 @@
 
 ApexStock is a modern, high-performance, containerized Inventory & Order Management System. It is built as a multi-container microservice stack managed by Docker Compose, featuring a **Vite + React** frontend served by **Nginx Alpine**, a **Python FastAPI** REST API, and a **PostgreSQL** database managed via **SQLAlchemy ORM**.
 
+### 🌐 Live Deployments
+- **Frontend App**: [https://apex-stock.vercel.app/](https://apex-stock.vercel.app/)
+- **Backend API**: [https://apexstock-backend.onrender.com](https://apexstock-backend.onrender.com)
+
 ---
 
 ## 🗺️ System Architecture Flowchart
@@ -174,12 +178,6 @@ To stop the containers and free up ports, run:
 ```powershell
 docker compose down
 ```
-
----
-## 🌐 Deployment
-
-- Frontend: https://apex-stock.vercel.app/
-- Backend: https://apexstock-backend.onrender.com
 
 ---
 
