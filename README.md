@@ -96,7 +96,7 @@ graph TD
    This automatically reads our SQLAlchemy tables and creates them inside PostgreSQL if they do not exist.
 3. **Automated Seeding**: The system executes [seed.py](file:///r:/Inventory%20&%20Order%20Management%20System/backend/app/seed.py) to purge tables and populate initial mock records:
    * **3 Customers** (Acme Corp, Jane Doe, Wayne Enterprises)
-   * **4 Products** (ThinkPad laptop, UltraWide monitor, wireless mouse, ergonomic chair)
+   * **4 Products** (Laptop, Monitor, Mouse, Chair)
    * **4 Orders** in various states (`PENDING`, `SHIPPED`, `DELIVERED`, `CANCELLED`) to populate the charts.
 
 ---

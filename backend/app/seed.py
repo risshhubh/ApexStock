@@ -35,7 +35,7 @@ def seed_db():
         # 2. Create Products
         p1 = Product(
             sku="EL-001",
-            name="ThinkPad X1 Carbon",
+            name="Laptop",
             description="High-end ultrabook with Intel i7, 16GB RAM, 512GB SSD",
             price=1499.99,
             quantity=15,
@@ -44,7 +44,7 @@ def seed_db():
         )
         p2 = Product(
             sku="EL-002",
-            name="UltraWide Monitor 34\"",
+            name="Monitor",
             description="34-inch curved IPS monitor with 144Hz refresh rate",
             price=499.99,
             quantity=8,
@@ -53,7 +53,7 @@ def seed_db():
         )
         p3 = Product(
             sku="EL-003",
-            name="Wireless Ergonomic Mouse",
+            name="Mouse",
             description="Ergonomic mouse with dual-mode connectivity and rechargeable battery",
             price=79.99,
             quantity=45,
@@ -62,7 +62,7 @@ def seed_db():
         )
         p4 = Product(
             sku="OF-101",
-            name="Steelcase Gesture Chair",
+            name="Chair",
             description="Premium ergonomic office chair with adjustable armrests and lumbar support",
             price=999.99,
             quantity=4,

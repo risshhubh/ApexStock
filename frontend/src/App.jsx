@@ -40,6 +40,8 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [productSearchQuery, setProductSearchQuery] = useState('');
 
   // Filter & Search states
   const [productSearch, setProductSearch] = useState('');
@@ -259,6 +261,8 @@ export default function App() {
     setOrderForm({ customerId: customers[0]?.id || '', cartItems: [] });
     setIsNewCustomer(true);
     setNewCustomerForm({ name: '', email: '', phone: '' });
+    setProductSearchQuery('');
+    setShowProductDropdown(false);
     setShowOrderModal(true);
   };
 
@@ -1268,33 +1272,123 @@ export default function App() {
                 )}
               </div>
 
-              {/* Product Lookup Dropdown */}
-              <div className="form-group" style={{ marginTop: '16px' }}>
+              {/* Custom Searchable Product Dropdown */}
+              <div className="form-group autocomplete-container" style={{ marginTop: '16px' }}>
                 <label className="form-label">Lookup Products to Add</label>
-                <select 
-                  className="form-input" 
-                  style={{ width: '100%', cursor: 'pointer' }}
-                  value=""
-                  onChange={(e) => {
-                    const selectedProduct = products.find(p => p.id === e.target.value);
-                    if (selectedProduct) addToCart(selectedProduct);
-                  }}
-                >
-                  <option value="">Select a product to add to cart...</option>
-                  {products.map(p => {
-                    const isOutOfStock = p.quantity <= 0;
-                    return (
-                      <option 
-                        key={p.id} 
-                        value={p.id} 
-                        disabled={isOutOfStock}
-                        style={{ backgroundColor: '#0f0f11', color: isOutOfStock ? 'var(--text-dark)' : 'var(--text-main)' }}
-                      >
-                        {p.name} — SKU: {p.sku} | Price: ${p.price.toFixed(2)} | Stock: {p.quantity} left {isOutOfStock ? '(OUT OF STOCK)' : ''}
-                      </option>
-                    );
-                  })}
-                </select>
+                
+                <div style={{ position: 'relative' }}>
+                  {/* Dropdown Trigger/Search Input */}
+                  <input 
+                    type="text"
+                    className="form-input"
+                    style={{ width: '100%', paddingRight: '40px', cursor: 'pointer' }}
+                    placeholder="Search and select product by name, SKU..."
+                    value={productSearchQuery}
+                    onChange={(e) => {
+                      setProductSearchQuery(e.target.value);
+                      setShowProductDropdown(true);
+                    }}
+                    onFocus={() => setShowProductDropdown(true)}
+                  />
+                  <div style={{
+                    position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                    color: 'var(--text-dark)', pointerEvents: 'none'
+                  }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
+
+                  {/* Dropdown Menu List */}
+                  {showProductDropdown && (
+                    <>
+                      <div 
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
+                        onClick={() => setShowProductDropdown(false)}
+                      />
+                      <ul className="suggestions-list" style={{
+                        position: 'absolute', top: '100%', left: 0, right: 0,
+                        backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-active)',
+                        borderRadius: 'var(--radius-md)', marginTop: '6px', maxHeight: '240px',
+                        overflowY: 'auto', zIndex: 999, padding: '6px 0',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)', listStyle: 'none'
+                      }}>
+                        {products
+                          .filter(p => 
+                            p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                            p.sku.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                            p.category.toLowerCase().includes(productSearchQuery.toLowerCase())
+                          )
+                          .length === 0 ? (
+                            <li style={{ padding: '12px 16px', color: 'var(--text-dark)', textAlign: 'center', fontSize: '0.85rem' }}>
+                              No matching products found
+                            </li>
+                          ) : (
+                            products
+                              .filter(p => 
+                                p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                                p.sku.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                                p.category.toLowerCase().includes(productSearchQuery.toLowerCase())
+                              )
+                              .map(p => {
+                                const isOutOfStock = p.quantity <= 0;
+                                return (
+                                  <li 
+                                    key={p.id}
+                                    style={{
+                                      padding: '10px 16px',
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+                                      borderBottom: '1px solid rgba(255, 255, 255, 0.02)',
+                                      opacity: isOutOfStock ? 0.5 : 1,
+                                      transition: 'background-color 0.15s ease'
+                                    }}
+                                    className={isOutOfStock ? "" : "custom-dropdown-item"}
+                                    onClick={() => {
+                                      if (!isOutOfStock) {
+                                        addToCart(p);
+                                        setProductSearchQuery('');
+                                        setShowProductDropdown(false);
+                                      }
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (!isOutOfStock) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (!isOutOfStock) e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'flex-start' }}>
+                                      <span style={{ fontWeight: 600, color: '#ffffff', fontSize: '0.9rem' }}>{p.name}</span>
+                                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{p.sku}</span>
+                                        <span style={{
+                                          fontSize: '0.65rem',
+                                          padding: '2px 6px',
+                                          borderRadius: '4px',
+                                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                          color: 'var(--text-muted)'
+                                        }}>{p.category}</span>
+                                      </div>
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
+                                      <span style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '0.9rem' }}>${p.price.toFixed(2)}</span>
+                                      <span style={{
+                                        fontSize: '0.7rem',
+                                        color: isOutOfStock ? 'var(--danger)' : p.quantity <= p.minStockLevel ? 'var(--warning)' : 'var(--text-dark)'
+                                      }}>
+                                        {isOutOfStock ? 'Out of stock' : `${p.quantity} left`}
+                                      </span>
+                                    </div>
+                                  </li>
+                                );
+                              })
+                          )}
+                      </ul>
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Shopping Cart List */}
