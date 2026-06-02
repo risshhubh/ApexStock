@@ -716,6 +716,28 @@ export default function App() {
                   </tbody>
                 </table>
               </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid var(--border-mute)' }}>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => { 
+                    setCurrentView('inventory'); 
+                    fetchData(); 
+                  }}
+                >
+                  Manage Products
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={() => { 
+                    setCurrentView('inventory'); 
+                    fetchData(); 
+                    handleOpenProductAdd(); 
+                  }}
+                >
+                  <IconPlus /> Add a Product
+                </button>
+              </div>
             </div>
           </div>
         )}
